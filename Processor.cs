@@ -20,6 +20,7 @@ namespace Untlited_Programming_Game
             public bool readable { get; private set; } = true;
         }
 
+        //Manter publico para fazer as interfaces graficas na UNITY
         public Dictionary<string, Register> Registers { get ; private set; } = new Dictionary<string, Register>();
 
         public void setRegister(string name, int value)
@@ -31,6 +32,7 @@ namespace Untlited_Programming_Game
             return Registers[name].value;  
         }
         public Processor() { 
+            this.Registers.Add("ZERO", new Register(true, false));
             this.Registers.Add("A", new Register(true, true));
             this.Registers.Add("B", new Register(true, true));
             this.Registers.Add("C", new Register(true, true));

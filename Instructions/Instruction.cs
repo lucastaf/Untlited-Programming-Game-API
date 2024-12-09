@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Untlited_Programming_Game.Instructions
 {
-    internal abstract class Instruction
+    internal interface Instruction
     {
-        public abstract void execute(Processor processor);
+        public void execute(Processor processor);
     }
 
     enum Operation
@@ -21,59 +21,26 @@ namespace Untlited_Programming_Game.Instructions
         mod
     }
 
-    internal class ArithmeticInstruction<T, U> : Instruction
+    enum Branch
     {
+        beq,
+        bne,
+        bgt,
+        blt,
+        ble,
+        bge,
+    }
 
-
-        private T RS1;
-        private U RS2;
-        private string RD;
-        Operation operation;
-
-        public ArithmeticInstruction(T RS1, U RS2, string RD, Operation operation)
-        {
-            if ((typeof(T) != typeof(string) && typeof(T) != typeof(int)) || (typeof(U) != typeof(string) && typeof(U) != typeof(int)))
-            {
-                throw new InvalidOperationException("Uma instrução aritmética só pode possuir int ou string para RS1 e RS2");
-            }
-            this.RS1 = RS1;
-            this.RS2 = RS2;
-            this.RD = RD;
-            this.operation = operation;
+    internal class PrintInstruction : Instruction
+    {
+        private string reg;
+        public PrintInstruction(string reg) {
+            this.reg = reg;
         }
 
-        public override void execute(Processor processor)
+        public void execute(Processor processor)
         {
-            int value1, value2;
-            int result;
-            if (this.RS1 is int)
-            {
-                value1 = Convert.ToInt32(this.RS1);
-            }
-            else
-            {
-                value1 = processor.getRegister(Convert.ToString(this.RS1));
-            }
-            if (this.RS2 is int)
-            {
-                value2 = Convert.ToInt32(this.RS2);
-            }
-            else
-            {
-                value2 = processor.getRegister(Convert.ToString(this.RS2));
-            }
-            switch (operation)
-            {
-                case Operation.add: result = value1 + value2; break;
-                case Operation.sub: result = value1 - value2; break;
-                case Operation.mul: result = value1 * value2; break;
-                case Operation.div: result = value1 / value2; break;
-                case Operation.mod: result = value1 % value2; break;
-                default: result = 0; break;
-            }
-
-            processor.setRegister(RD, result);
+            Console.WriteLine(reg + " = " + processor.getRegister(reg));
         }
-
     }
 }
