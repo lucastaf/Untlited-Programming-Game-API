@@ -3,21 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Untlited_Programming_Game.Instructions
 {
-    internal class BranchInstruction<T> : Instruction
+    internal class BranchInstruction<T, U> : Instruction
     {
         private Branch BranchType;
         private string RS1;
         private T RS2;
-        private int Dest;
+        private U Dest;
 
-        public BranchInstruction(Branch branchType, string rS1, T rS2, int dest)
+        public BranchInstruction(Branch branchType, string rS1, T rS2, U dest)
         {
             if ((typeof(T) != typeof(string) && typeof(T) != typeof(int)))
             {
                 throw new InvalidOperationException("Uma instrução de Branch só pode possuir int ou string para RS2");
+            }
+            if ((typeof(U) != typeof(string) && typeof(U) != typeof(int)))
+            {
+                throw new InvalidOperationException("Uma instrução de Branch só pode possuir int ou string para Destino");
             }
             BranchType = branchType;
             RS1 = rS1;
@@ -30,7 +35,8 @@ namespace Untlited_Programming_Game.Instructions
             int value1 = processor.getRegister(RS1);
             int value2 = 0;
             bool Valid;
-            if (typeof(T) == typeof(string)){
+            if (typeof(T) == typeof(string))
+            {
                 value2 = processor.getRegister(Convert.ToString(RS2));
             }
             else
@@ -49,9 +55,31 @@ namespace Untlited_Programming_Game.Instructions
             }
             if (Valid)
             {
-                processor.setRegister("Counter", Dest - 1);
+                if (typeof(U) == typeof(int))
+                {
+                    int counter = processor.getRegister("Counter");
+                    processor.setRegister("Counter", Convert.ToInt32(Dest) + counter - 1);
+                }else if (typeof(U) == typeof(string))
+                {
+                    int counter = processor.getLabel(Convert.ToString(Dest));
+                    processor.setRegister("Counter", counter - 1);
+                }
             }
-            
+
+        }
+    }
+
+    internal class LabelInstruction : Instruction
+    {
+        public LabelInstruction(string label)
+        {
+            this.label = label;
+        }
+
+        public string label { get; private set; }
+
+        public void execute(Processor processor)
+        {
         }
     }
 }

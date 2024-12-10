@@ -23,6 +23,7 @@ namespace Untlited_Programming_Game
         //Manter publico para fazer as interfaces graficas na UNITY
         public Dictionary<string, Register> Registers { get ; private set; } = new Dictionary<string, Register>();
 
+        private List<Instruction> Instructions = new List<Instruction>();
         public void setRegister(string name, int value)
         {
             this.Registers[name].value = value;
@@ -42,7 +43,6 @@ namespace Untlited_Programming_Game
             this.Registers.Add("OUT", new Register(false, true));
         }
 
-        private List<Instruction> Instructions = new List<Instruction>();
 
         public void addInstruction(Instruction instruction) { 
             this.Instructions.Add(instruction);
@@ -51,6 +51,22 @@ namespace Untlited_Programming_Game
         public void loadProgram(Instruction[] instructions)
         {
             this.Instructions.AddRange(instructions);
+        }
+
+        public int getLabel(string label)
+        {
+            int index = 0;
+            foreach (var instruction in this.Instructions) {
+                if(instruction is LabelInstruction)
+                {
+                    if(((LabelInstruction)instruction).label == label){
+                        return index;
+                    }
+                }
+
+                index++;
+            }
+            return -1;
         }
 
         public void Execute()
