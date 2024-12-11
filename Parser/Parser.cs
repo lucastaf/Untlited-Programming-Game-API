@@ -9,13 +9,14 @@ using System.Reflection;
 
 namespace Untlited_Programming_Game.Parser
 {
-    internal static class Parser
+    internal static partial class Parser
     {
         public static Instruction[] parseProgram(string instructionText, out CodeException[] exceptions)
         {
             int line = 0;
             List<CodeException> errors = new List<CodeException>();
             List<Instruction> instructions = new List<Instruction>();
+            Dictionary<string, int> macros = new Dictionary<string, int>();
             foreach (string instruction in instructionText.ToUpper().Split("\r\n"))
             {
                 try
@@ -24,7 +25,11 @@ namespace Untlited_Programming_Game.Parser
                     {
                         continue;
                     }
-                    instructions.Add(parseInstruction(instruction, line));
+                    Instruction newInstruction = parseInstruction(instruction, line, macros);
+                    if (newInstruction is not MacroInstruction)
+                    {
+                        instructions.Add(newInstruction);
+                    }
                 }
                 catch (CodeException e)
                 {
@@ -35,112 +40,71 @@ namespace Untlited_Programming_Game.Parser
             exceptions = errors.ToArray();
             return instructions.ToArray();
         }
-        public static Instruction parseInstruction(string instructionText, int line)
+        public static Instruction parseInstruction(string instructionText, int line, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
             try
             {
-                Func<string, Instruction> parseFunction;
+                Func<string, Dictionary<string, int>, Instruction> parseFunction;
                 if (InstructionsCode.TryGetValue(instructionParts[0], out parseFunction))
                 {
-                    return parseFunction(instructionText);
+                    return parseFunction(instructionText, macros);
+                }
+                else if (instructionParts[1] == "=")
+                {
+                    return parseArithmeticInstruction(instructionText, macros);
                 }
                 else
                 {
-                    return parseArithmeticInstruction(instructionText);
+                    throw new NotImplementedException();
                 };
 
             }
             catch (Exception e)
             {
+                if (e is CodeException)
+                {
+                    throw e;
+                }
                 throw new InvalidInstructionException(line);
             }
         }
 
-        private static readonly Dictionary<string, Func<string, Instruction>> InstructionsCode = new Dictionary<string, Func<string, Instruction>>()
+        private static readonly Dictionary<string, Func<string, Dictionary<string, int>, Instruction>> InstructionsCode = new Dictionary<string, Func<string, Dictionary<string, int>, Instruction>>()
         {
             {"IF", parseBranchInstruction },
             {"PRINT", parsePrintInstruction },
+            {"READ", parseReadInstruction},
             {"LABEL", parseLabelInstruction },
+            {"MACRO", parseMacroInstruction},
         };
 
-        private static Instruction parseArithmeticInstruction(string instructionText)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            Dictionary<string, Operation> operationMap = new Dictionary<string, Operation>()
-            {
-                {"+", Operation.add },
-                {"-", Operation.sub },
-                {"/", Operation.div },
-                {"*", Operation.mul },
-                {"%", Operation.mod },
-            };
-            Operation operation = operationMap[instructionParts[3]];
-            int value1, value2;
-            if (Int32.TryParse(instructionParts[2], out value1))
-            {
-                if (Int32.TryParse(instructionParts[4], out value2))
-                    return new ArithmeticInstruction<int, int>(operation, value1, value2, instructionParts[0]);
-                else
-                    return new ArithmeticInstruction<int, string>(operation, value1, instructionParts[4], instructionParts[0]);
-            }
-            else
-            {
-                if (Int32.TryParse(instructionParts[4], out value2))
-                    return new ArithmeticInstruction<string, int>(operation, instructionParts[2], value2, instructionParts[0]);
-                else
-                    return new ArithmeticInstruction<string, string>(operation, instructionParts[2], instructionParts[4], instructionParts[0]);
-            }
-
-        }
-
-        private static Instruction parseBranchInstruction(string instructionText)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            Branch branchType;
-            int value2;
-
-            Dictionary<string, Branch> branchMap = new Dictionary<string, Branch>()
-            {
-                {">", Branch.bgt },
-                {"<", Branch.blt },
-                {"=", Branch.beq },
-                {"!=", Branch.bne },
-                {"<=", Branch.ble },
-                {">=", Branch.bge }
-            };
-            if (instructionParts[4] == "GOTO")
-            {
-                if (Int32.TryParse(instructionParts[3], out value2))
-                    return new BranchInstruction<int, string>(branchMap[instructionParts[2]], instructionParts[1], value2, instructionParts[5]);
-                else
-                    return new BranchInstruction<string, string>(branchMap[instructionParts[2]], instructionParts[1], instructionParts[3], instructionParts[5]);
-            }
-            else if (instructionParts[4] == "JUMP")
-            {
-                int dest = Int32.Parse(instructionParts[5]);
-                if (Int32.TryParse(instructionParts[3], out value2))
-                    return new BranchInstruction<int, int>(branchMap[instructionParts[2]], instructionParts[1], value2, dest);
-                else
-                    return new BranchInstruction<string, int>(branchMap[instructionParts[2]], instructionParts[1], instructionParts[3], dest);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private static Instruction parsePrintInstruction(string instructionText)
+        private static Instruction parsePrintInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
             return new PrintInstruction(instructionParts[1]);
         }
 
-        private static Instruction parseLabelInstruction(string instructionText)
+        private static Instruction parseReadInstruction(string instructionText, Dictionary<string, int> macros)
+        {
+            string[] instructionParts = instructionText.Split(" ");
+            return new ReadInstruction(instructionParts[1]);
+        }
+
+        private static Instruction parseLabelInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
             return new LabelInstruction(instructionParts[1]);
         }
+
+        private static Instruction parseMacroInstruction(string instructionText, Dictionary<string, int> macros)
+        {
+            string[] instructionParts = instructionText.Split(" ");
+            int value = Int32.Parse(instructionParts[2]);
+            macros.Add(instructionParts[1], value);
+            return new MacroInstruction();
+        }
+    
     }
 
 

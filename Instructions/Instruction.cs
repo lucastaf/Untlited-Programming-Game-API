@@ -34,13 +34,38 @@ namespace Untlited_Programming_Game.Instructions
     internal class PrintInstruction : Instruction
     {
         private string reg;
-        public PrintInstruction(string reg) {
+        public PrintInstruction(string reg)
+        {
             this.reg = reg;
         }
 
         public void execute(Processor processor)
         {
             Console.WriteLine(reg + " = " + processor.getRegister(reg));
+        }
+    }
+
+    internal class ReadInstruction : Instruction
+    {
+        private string reg;
+        public ReadInstruction(string reg)
+        {
+            this.reg = reg;
+        }
+
+        public void execute(Processor processor)
+        {
+            string resultString = Console.ReadLine();
+            int result = Int32.Parse(resultString);
+            processor.setRegister(this.reg, result);
+        }
+    }
+
+    internal class MacroInstruction : Instruction
+    {
+        public void execute(Processor processor)
+        {
+            throw new NotImplementedException();
         }
     }
 }
