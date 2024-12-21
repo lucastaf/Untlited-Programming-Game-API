@@ -10,16 +10,15 @@ namespace Untlited_Programming_Game.Exceptions
     internal class CodeException : Exception
     {
         public int line;
-        public CodeException(string message, int line) : base(message) {
-            this.line = line;
-        }
-
-    }
-
-    internal class InvalidInstructionException : CodeException
-    {
-        public InvalidInstructionException(int line) : base("Instrução Inválida", line)
+        public string code;
+        public CodeException(string message, string code, int line) : base(message)
         {
+            this.line = line;
+            this.code = code;
         }
+
     }
+
+
+
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Untlited_Programming_Game.Exceptions;
 using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game.Parser
@@ -12,6 +13,7 @@ namespace Untlited_Programming_Game.Parser
         private static Instruction parseBranchInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 6) throw new InvalidSizeException(0);
             int value2;
             bool isInt2 = Int32.TryParse(instructionParts[3], out value2);
             if (!isInt2)
@@ -25,7 +27,9 @@ namespace Untlited_Programming_Game.Parser
                 {"<=", Branch.ble },
                 {">=", Branch.bge }
             };
-            Branch branchType = branchMap[instructionParts[2]];
+            Branch branchType;
+            bool isBranchValid = branchMap.TryGetValue(instructionParts[2], out branchType);
+            if (!isBranchValid) throw new InvalidSimbolException(0);
             if (instructionParts[4] == "GOTO")
             {
                 if (isInt2)
@@ -45,7 +49,7 @@ namespace Untlited_Programming_Game.Parser
             }
             else
             {
-                throw new NotImplementedException();
+                throw new InvalidSimbolException(0);
             }
         }
 

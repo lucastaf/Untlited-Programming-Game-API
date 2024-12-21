@@ -64,6 +64,7 @@ namespace Untlited_Programming_Game.Parser
             {
                 if (e is CodeException)
                 {
+                    ((CodeException)e).line = line;
                     throw e;
                 }
                 throw new InvalidInstructionException(line);
@@ -82,25 +83,31 @@ namespace Untlited_Programming_Game.Parser
         private static Instruction parsePrintInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 2) throw new InvalidSizeException(0);
             return new PrintInstruction(instructionParts[1]);
         }
 
         private static Instruction parseReadInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 2) throw new InvalidSizeException(0);
             return new ReadInstruction(instructionParts[1]);
         }
 
         private static Instruction parseLabelInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 2) throw new InvalidSizeException(0);
             return new LabelInstruction(instructionParts[1]);
         }
 
         private static Instruction parseMacroInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
-            int value = Int32.Parse(instructionParts[2]);
+            if (instructionParts.Length != 3) throw new InvalidSizeException(0);
+            int value;
+            bool isInt = Int32.TryParse(instructionParts[2], out value);
+            if (!isInt) throw new InvalidInputException(0);
             macros.Add(instructionParts[1], value);
             return new MacroInstruction();
         }

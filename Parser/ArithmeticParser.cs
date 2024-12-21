@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Untlited_Programming_Game.Exceptions;
 using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game.Parser
@@ -13,6 +14,8 @@ namespace Untlited_Programming_Game.Parser
         {
             string[] instructionParts = instructionText.Split(" ");
             int instructionSize = instructionParts.Length;
+            
+            if (instructionSize != 3 || instructionSize != 5) throw new InvalidSizeException(0);
             Dictionary<string, Operation> operationMap = new Dictionary<string, Operation>()
             {
                 {"+", Operation.add },
@@ -36,7 +39,10 @@ namespace Untlited_Programming_Game.Parser
             else if (instructionSize == 5)
             {
                 int value2;
-                Operation operation = operationMap[instructionParts[3]];
+                Operation operation;
+                bool isValidOperation = operationMap.TryGetValue(instructionParts[3], out operation);
+                if (isValidOperation) throw new InvalidSimbolException(0);
+
                 bool isInt2 = Int32.TryParse(instructionParts[4], out value2);
                 if (!isInt2) isInt2 = macros.TryGetValue(instructionParts[4], out value2);
                 if (isInt1)
@@ -53,7 +59,7 @@ namespace Untlited_Programming_Game.Parser
             }
             else
             {
-                throw new Exception();
+                throw new InvalidSimbolException(0, "Branch instruction must be type GOTO or JUMP");
             }
         }
     }
