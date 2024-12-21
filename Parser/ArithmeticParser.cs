@@ -12,6 +12,7 @@ namespace Untlited_Programming_Game.Parser
         private static Instruction parseArithmeticInstruction(string instructionText, Dictionary<string, int> macros)
         {
             string[] instructionParts = instructionText.Split(" ");
+            int instructionSize = instructionParts.Length;
             Dictionary<string, Operation> operationMap = new Dictionary<string, Operation>()
             {
                 {"+", Operation.add },
@@ -20,23 +21,40 @@ namespace Untlited_Programming_Game.Parser
                 {"*", Operation.mul },
                 {"%", Operation.mod },
             };
-            Operation operation = operationMap[instructionParts[3]];
-            int value1, value2;
-            bool isInt1 = Int32.TryParse(instructionParts[2], out value1), isInt2 = Int32.TryParse(instructionParts[4], out value2);
+            int value1;
+            bool isInt1 = Int32.TryParse(instructionParts[2], out value1);
             if (!isInt1) isInt1 = macros.TryGetValue(instructionParts[2], out value1);
-            if (!isInt2) isInt2 = macros.TryGetValue(instructionParts[4], out value2);
 
-            if (isInt1)
+            if (instructionSize == 3)
             {
-                if (isInt2) return new ArithmeticInstruction<int, int>(operation, value1, value2, instructionParts[0]);
-                else return new ArithmeticInstruction<int, string>(operation, value1, instructionParts[4], instructionParts[0]);
+                if (isInt1)
+                    return new AssignInstruction<int>(value1, instructionParts[0]);
+                else
+                    return new AssignInstruction<string>(instructionParts[2], instructionParts[0]);
+
+            }
+            else if (instructionSize == 5)
+            {
+                int value2;
+                Operation operation = operationMap[instructionParts[3]];
+                bool isInt2 = Int32.TryParse(instructionParts[4], out value2);
+                if (!isInt2) isInt2 = macros.TryGetValue(instructionParts[4], out value2);
+                if (isInt1)
+                {
+                    if (isInt2) return new ArithmeticInstruction<int, int>(operation, value1, value2, instructionParts[0]);
+                    else return new ArithmeticInstruction<int, string>(operation, value1, instructionParts[4], instructionParts[0]);
+                }
+                else
+                {
+                    if (isInt2) return new ArithmeticInstruction<string, int>(operation, instructionParts[2], value2, instructionParts[0]);
+                    else return new ArithmeticInstruction<string, string>(operation, instructionParts[2], instructionParts[4], instructionParts[0]);
+                }
+
             }
             else
             {
-                if (isInt2) return new ArithmeticInstruction<string, int>(operation, instructionParts[2], value2, instructionParts[0]);
-                else return new ArithmeticInstruction<string, string>(operation, instructionParts[2], instructionParts[4], instructionParts[0]);
+                throw new Exception();
             }
-
         }
     }
 }

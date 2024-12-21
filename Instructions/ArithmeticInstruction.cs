@@ -7,6 +7,32 @@ using System.Threading.Tasks;
 
 namespace Untlited_Programming_Game.Instructions
 {
+
+    internal class AssignInstruction<T> : Instruction
+    {
+        private T RS1;
+        private string RD;
+        public AssignInstruction(T RS1, string RD){
+            if (typeof(T) != typeof(string) && typeof(T) != typeof(int)){
+                throw new InvalidOperationException("Uma instrução aritmética só pode possuir int ou string para RS1");
+            }
+            this.RS1 = RS1;
+            this.RD = RD;
+        }
+        public void execute(Processor processor)
+        {
+            int value;
+            if(this.RS1 is int)
+            {
+                value = Convert.ToInt32(this.RS1);
+            }
+            else
+            {
+                value = processor.getRegister(Convert.ToString(this.RS1));
+            }
+            processor.setRegister(this.RD, value);
+        }
+    }
     internal class ArithmeticInstruction<T, U> : Instruction
     {
 
