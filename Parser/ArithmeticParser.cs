@@ -15,7 +15,6 @@ namespace Untlited_Programming_Game.Parser
             string[] instructionParts = instructionText.Split(" ");
             int instructionSize = instructionParts.Length;
             
-            if (instructionSize != 3 || instructionSize != 5) throw new InvalidSizeException(0);
             Dictionary<string, Operation> operationMap = new Dictionary<string, Operation>()
             {
                 {"+", Operation.add },
@@ -41,7 +40,7 @@ namespace Untlited_Programming_Game.Parser
                 int value2;
                 Operation operation;
                 bool isValidOperation = operationMap.TryGetValue(instructionParts[3], out operation);
-                if (isValidOperation) throw new InvalidSimbolException(0);
+                if (isValidOperation) throw new InvalidSimbolException(0, "invalid operation");
 
                 bool isInt2 = Int32.TryParse(instructionParts[4], out value2);
                 if (!isInt2) isInt2 = macros.TryGetValue(instructionParts[4], out value2);
@@ -59,7 +58,7 @@ namespace Untlited_Programming_Game.Parser
             }
             else
             {
-                throw new InvalidSimbolException(0, "Branch instruction must be type GOTO or JUMP");
+                throw new InvalidSizeException(0);
             }
         }
     }

@@ -29,7 +29,7 @@ namespace Untlited_Programming_Game.Parser
             };
             Branch branchType;
             bool isBranchValid = branchMap.TryGetValue(instructionParts[2], out branchType);
-            if (!isBranchValid) throw new InvalidSimbolException(0);
+            if (!isBranchValid) throw new InvalidSimbolException(0, "Invalid comparison");
             if (instructionParts[4] == "GOTO")
             {
                 if (isInt2)
@@ -41,7 +41,8 @@ namespace Untlited_Programming_Game.Parser
             {
                 int dest;
                 bool isDestInt = Int32.TryParse(instructionParts[5], out dest);
-                if (!isDestInt) dest = macros[instructionParts[5]];
+                if (!isDestInt) isDestInt = macros.TryGetValue(instructionParts[5], out dest);
+                if (!isDestInt) throw new InvalidInputException(0,"Last argument of an JUMP branch must be an number");
                 if (isInt2)
                     return new BranchInstruction<int, int>(branchType, instructionParts[1], value2, dest);
                 else
@@ -49,7 +50,7 @@ namespace Untlited_Programming_Game.Parser
             }
             else
             {
-                throw new InvalidSimbolException(0);
+                throw new InvalidSimbolException(0, "Branch instruction must be of type GOTO or JUMP");
             }
         }
 
