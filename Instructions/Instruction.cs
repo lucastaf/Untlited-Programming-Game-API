@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Untlited_Programming_Game.Instructions
 {
-    internal interface Instruction
+    internal abstract class Instruction
     {
-        public void execute(Processor processor);
+        public Instruction(int line)
+        {
+            this.line = line;
+        }
+
+        public int line { get; private set; }
+        public abstract void execute(Processor processor);
     }
 
     enum Operation
@@ -34,12 +40,12 @@ namespace Untlited_Programming_Game.Instructions
     internal class PrintInstruction : Instruction
     {
         private string reg;
-        public PrintInstruction(string reg)
+        public PrintInstruction(string reg, int line) : base(line)
         {
             this.reg = reg;
         }
 
-        public void execute(Processor processor)
+        public override void execute(Processor processor)
         {
             Console.WriteLine(reg + " = " + processor.getRegister(reg));
         }
@@ -48,12 +54,12 @@ namespace Untlited_Programming_Game.Instructions
     internal class ReadInstruction : Instruction
     {
         private string reg;
-        public ReadInstruction(string reg)
+        public ReadInstruction(string reg, int line) : base(line)
         {
             this.reg = reg;
         }
 
-        public void execute(Processor processor)
+        public override void execute(Processor processor)
         {
             string resultString = Console.ReadLine();
             int result = Int32.Parse(resultString);
@@ -63,7 +69,8 @@ namespace Untlited_Programming_Game.Instructions
 
     internal class MacroInstruction : Instruction
     {
-        public void execute(Processor processor)
+        public MacroInstruction(int line) : base(line) { }
+        public override void execute(Processor processor)
         {
             throw new NotImplementedException();
         }

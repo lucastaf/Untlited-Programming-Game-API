@@ -12,14 +12,14 @@ namespace Untlited_Programming_Game.Instructions
     {
         private T RS1;
         private string RD;
-        public AssignInstruction(T RS1, string RD){
+        public AssignInstruction(T RS1, string RD, int line) : base(line){
             if (typeof(T) != typeof(string) && typeof(T) != typeof(int)){
                 throw new InvalidOperationException("Uma instrução aritmética só pode possuir int ou string para RS1");
             }
             this.RS1 = RS1;
             this.RD = RD;
         }
-        public void execute(Processor processor)
+        public override void execute(Processor processor)
         {
             int value;
             if(this.RS1 is int)
@@ -44,7 +44,7 @@ namespace Untlited_Programming_Game.Instructions
         private string RD;
         Operation operation;
 
-        public ArithmeticInstruction(Operation operation, T RS1, U RS2, string RD)
+        public ArithmeticInstruction(Operation operation, T RS1, U RS2, string RD, int line) : base(line)
         {
             if ((typeof(T) != typeof(string) && typeof(T) != typeof(int)) || (typeof(U) != typeof(string) && typeof(U) != typeof(int)))
             {
@@ -56,7 +56,7 @@ namespace Untlited_Programming_Game.Instructions
             this.operation = operation;
         }
 
-        public void execute(Processor processor)
+        public override void execute(Processor processor)
         {
             int value1, value2;
             int result;

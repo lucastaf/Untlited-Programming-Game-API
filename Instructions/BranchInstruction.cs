@@ -14,7 +14,7 @@ namespace Untlited_Programming_Game.Instructions
         private T RS2;
         private U Dest;
 
-        public BranchInstruction(Branch branchType, string rS1, T rS2, U dest)
+        public BranchInstruction(Branch branchType, string rS1, T rS2, U dest, int line) : base(line)
         {
             if ((typeof(T) != typeof(string) && typeof(T) != typeof(int)))
             {
@@ -30,7 +30,7 @@ namespace Untlited_Programming_Game.Instructions
             Dest = dest;
         }
 
-        public void execute(Processor processor)
+        public override void execute(Processor processor)
         {
             int value1 = processor.getRegister(RS1);
             int value2 = 0;
@@ -71,15 +71,16 @@ namespace Untlited_Programming_Game.Instructions
 
     internal class LabelInstruction : Instruction
     {
-        public LabelInstruction(string label)
+        public LabelInstruction(string label, int line) : base(line)
         {
             this.label = label;
         }
 
         public string label { get; private set; }
 
-        public void execute(Processor processor)
+        public override void execute(Processor processor)
         {
+            throw new NotImplementedException();
         }
     }
 }

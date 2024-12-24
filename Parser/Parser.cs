@@ -46,18 +46,18 @@ namespace Untlited_Programming_Game.Parser
             string[] instructionParts = instructionText.Split(" ");
             try
             {
-                Func<string, Dictionary<string, int>, Instruction> parseFunction;
+                Func<string, Dictionary<string, int>,int, Instruction> parseFunction;
                 if (InstructionsCode.TryGetValue(instructionParts[0], out parseFunction))
                 {
-                    return parseFunction(instructionText, macros);
+                    return parseFunction(instructionText, macros, line);
                 }
                 else if (instructionParts[1] == "=")
                 {
-                    return parseArithmeticInstruction(instructionText, macros);
+                    return parseArithmeticInstruction(instructionText, macros, line);
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new InvalidInstructionException(line);
                 };
 
             }
@@ -72,7 +72,7 @@ namespace Untlited_Programming_Game.Parser
             }
         }
 
-        private static readonly Dictionary<string, Func<string, Dictionary<string, int>, Instruction>> InstructionsCode = new Dictionary<string, Func<string, Dictionary<string, int>, Instruction>>()
+        private static readonly Dictionary<string, Func<string, Dictionary<string, int>, int, Instruction>> InstructionsCode = new Dictionary<string, Func<string, Dictionary<string, int>, int, Instruction>>()
         {
             {"IF", parseBranchInstruction },
             {"PRINT", parsePrintInstruction },
@@ -81,36 +81,36 @@ namespace Untlited_Programming_Game.Parser
             {"MACRO", parseMacroInstruction},
         };
 
-        private static Instruction parsePrintInstruction(string instructionText, Dictionary<string, int> macros)
+        private static Instruction parsePrintInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(0);
-            return new PrintInstruction(instructionParts[1]);
+            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
+            return new PrintInstruction(instructionParts[1], line);
         }
 
-        private static Instruction parseReadInstruction(string instructionText, Dictionary<string, int> macros)
+        private static Instruction parseReadInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(0);
-            return new ReadInstruction(instructionParts[1]);
+            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
+            return new ReadInstruction(instructionParts[1], line);
         }
 
-        private static Instruction parseLabelInstruction(string instructionText, Dictionary<string, int> macros)
+        private static Instruction parseLabelInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(0);
-            return new LabelInstruction(instructionParts[1]);
+            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
+            return new LabelInstruction(instructionParts[1], line);
         }
 
-        private static Instruction parseMacroInstruction(string instructionText, Dictionary<string, int> macros)
+        private static Instruction parseMacroInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 3) throw new InvalidSizeException(0);
+            if (instructionParts.Length != 3) throw new InvalidSizeException(line);
             int value;
             bool isInt = Int32.TryParse(instructionParts[2], out value);
-            if (!isInt) throw new InvalidInputException(0);
+            if (!isInt) throw new InvalidInputException(line);
             macros.Add(instructionParts[1], value);
-            return new MacroInstruction();
+            return new MacroInstruction(line);
         }
     
     }

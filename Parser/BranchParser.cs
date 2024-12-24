@@ -10,10 +10,10 @@ namespace Untlited_Programming_Game.Parser
 {
     internal static partial class Parser
     {
-        private static Instruction parseBranchInstruction(string instructionText, Dictionary<string, int> macros)
+        private static Instruction parseBranchInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 6) throw new InvalidSizeException(0);
+            if (instructionParts.Length != 6) throw new InvalidSizeException(line);
             int value2;
             bool isInt2 = Int32.TryParse(instructionParts[3], out value2);
             if (!isInt2)
@@ -29,28 +29,28 @@ namespace Untlited_Programming_Game.Parser
             };
             Branch branchType;
             bool isBranchValid = branchMap.TryGetValue(instructionParts[2], out branchType);
-            if (!isBranchValid) throw new InvalidSimbolException(0, "Invalid comparison");
+            if (!isBranchValid) throw new InvalidSimbolException(line, "Invalid comparison");
             if (instructionParts[4] == "GOTO")
             {
                 if (isInt2)
-                    return new BranchInstruction<int, string>(branchType, instructionParts[1], value2, instructionParts[5]);
+                    return new BranchInstruction<int, string>(branchType, instructionParts[1], value2, instructionParts[5], line);
                 else
-                    return new BranchInstruction<string, string>(branchType, instructionParts[1], instructionParts[3], instructionParts[5]);
+                    return new BranchInstruction<string, string>(branchType, instructionParts[1], instructionParts[3], instructionParts[5], line);
             }
             else if (instructionParts[4] == "JUMP")
             {
                 int dest;
                 bool isDestInt = Int32.TryParse(instructionParts[5], out dest);
                 if (!isDestInt) isDestInt = macros.TryGetValue(instructionParts[5], out dest);
-                if (!isDestInt) throw new InvalidInputException(0,"Last argument of an JUMP branch must be an number");
+                if (!isDestInt) throw new InvalidInputException(line,"Last argument of an JUMP branch must be an number");
                 if (isInt2)
-                    return new BranchInstruction<int, int>(branchType, instructionParts[1], value2, dest);
+                    return new BranchInstruction<int, int>(branchType, instructionParts[1], value2, dest, line);
                 else
-                    return new BranchInstruction<string, int>(branchType, instructionParts[1], instructionParts[3], dest);
+                    return new BranchInstruction<string, int>(branchType, instructionParts[1], instructionParts[3], dest, line);
             }
             else
             {
-                throw new InvalidSimbolException(0, "Branch instruction must be of type GOTO or JUMP");
+                throw new InvalidSimbolException(line, "Branch instruction must be of type GOTO or JUMP");
             }
         }
 

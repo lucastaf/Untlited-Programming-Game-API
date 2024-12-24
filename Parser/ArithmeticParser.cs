@@ -10,7 +10,7 @@ namespace Untlited_Programming_Game.Parser
 {
     internal static partial class Parser
     {
-        private static Instruction parseArithmeticInstruction(string instructionText, Dictionary<string, int> macros)
+        private static Instruction parseArithmeticInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             int instructionSize = instructionParts.Length;
@@ -30,9 +30,9 @@ namespace Untlited_Programming_Game.Parser
             if (instructionSize == 3)
             {
                 if (isInt1)
-                    return new AssignInstruction<int>(value1, instructionParts[0]);
+                    return new AssignInstruction<int>(value1, instructionParts[0], line);
                 else
-                    return new AssignInstruction<string>(instructionParts[2], instructionParts[0]);
+                    return new AssignInstruction<string>(instructionParts[2], instructionParts[0], line);
 
             }
             else if (instructionSize == 5)
@@ -40,25 +40,25 @@ namespace Untlited_Programming_Game.Parser
                 int value2;
                 Operation operation;
                 bool isValidOperation = operationMap.TryGetValue(instructionParts[3], out operation);
-                if (!isValidOperation) throw new InvalidSimbolException(0, "invalid arithmetic operation");
+                if (!isValidOperation) throw new InvalidSimbolException(line, "invalid arithmetic operation");
 
                 bool isInt2 = Int32.TryParse(instructionParts[4], out value2);
                 if (!isInt2) isInt2 = macros.TryGetValue(instructionParts[4], out value2);
                 if (isInt1)
                 {
-                    if (isInt2) return new ArithmeticInstruction<int, int>(operation, value1, value2, instructionParts[0]);
-                    else return new ArithmeticInstruction<int, string>(operation, value1, instructionParts[4], instructionParts[0]);
+                    if (isInt2) return new ArithmeticInstruction<int, int>(operation, value1, value2, instructionParts[0], line);
+                    else return new ArithmeticInstruction<int, string>(operation, value1, instructionParts[4], instructionParts[0], line);
                 }
                 else
                 {
-                    if (isInt2) return new ArithmeticInstruction<string, int>(operation, instructionParts[2], value2, instructionParts[0]);
-                    else return new ArithmeticInstruction<string, string>(operation, instructionParts[2], instructionParts[4], instructionParts[0]);
+                    if (isInt2) return new ArithmeticInstruction<string, int>(operation, instructionParts[2], value2, instructionParts[0], line);
+                    else return new ArithmeticInstruction<string, string>(operation, instructionParts[2], instructionParts[4], instructionParts[0], line);
                 }
 
             }
             else
             {
-                throw new InvalidSizeException(0);
+                throw new InvalidSizeException(line);
             }
         }
     }
