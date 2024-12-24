@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Untlited_Programming_Game.Exceptions;
 using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game
@@ -21,18 +22,53 @@ namespace Untlited_Programming_Game
         }
 
         //Manter publico para fazer as interfaces graficas na UNITY
-        public Dictionary<string, Register> Registers { get ; private set; } = new Dictionary<string, Register>();
+        public Dictionary<string, Register> Registers { get; private set; } = new Dictionary<string, Register>();
 
         private List<Instruction> Instructions = new List<Instruction>();
         public void setRegister(string name, int value)
         {
-            this.Registers[name].value = value;
-        } 
+            Register? register;
+            bool registerExists = Registers.TryGetValue(name, out register);
+            if (!registerExists)
+            {
+                throw new InvalidRegisterException(0);
+            }
+            else
+            {
+                if (register.writable)
+                {
+                    register.value = value;
+                    return;
+                }
+                else
+                {
+                    throw new UnauthorizedRegisterException(0, AccessType.write);
+                }
+            }
+
+        }
         public int getRegister(string name)
         {
-            return Registers[name].value;  
+            Register? register;
+            bool registerExists = Registers.TryGetValue(name, out register);
+            if (!registerExists)
+            {
+                throw new InvalidRegisterException(0);
+            }
+            else
+            {
+                if (register.readable)
+                {
+                    return register.value;
+                }
+                else
+                {
+                    throw new UnauthorizedRegisterException(0, AccessType.read);
+                }
+            }
         }
-        public Processor() { 
+        public Processor()
+        {
             this.Registers.Add("ZERO", new Register(true, false));
             this.Registers.Add("A", new Register(true, true));
             this.Registers.Add("B", new Register(true, true));
@@ -44,7 +80,8 @@ namespace Untlited_Programming_Game
         }
 
 
-        public void addInstruction(Instruction instruction) { 
+        public void addInstruction(Instruction instruction)
+        {
             this.Instructions.Add(instruction);
         }
 
@@ -56,23 +93,34 @@ namespace Untlited_Programming_Game
         public int getLabel(string label)
         {
             int index = 0;
-            foreach (var instruction in this.Instructions) {
-                if(instruction is LabelInstruction)
+            foreach (var instruction in this.Instructions)
+            {
+                if (instruction is LabelInstruction)
                 {
-                    if(((LabelInstruction)instruction).label == label){
+                    if (((LabelInstruction)instruction).label == label)
+                    {
                         return index;
                     }
                 }
 
                 index++;
             }
-            return -1;
+            throw new InvalidLabelException(0);
         }
 
         public void Execute()
         {
-            this.Instructions[Registers["Counter"].value].execute(this);
-            this.Registers["Counter"].value ++;
+            Instruction instruction = this.Instructions[Registers["Counter"].value];
+            try
+            {
+                instruction.execute(this);
+                this.Registers["Counter"].value++;
+            }
+            catch (CodeException e)
+            {
+                e.line = instruction.line;
+                throw e;
+            }
         }
 
         public void RunTillFinish()
@@ -87,7 +135,7 @@ namespace Untlited_Programming_Game
         {
             foreach (var register in this.Registers)
             {
-                Console.WriteLine( $"{register.Key} = {register.Value.value}");
+                Console.WriteLine($"{register.Key} = {register.Value.value}");
             }
         }
 

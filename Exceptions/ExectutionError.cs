@@ -19,10 +19,10 @@ namespace Untlited_Programming_Game.Exceptions
     {
         read, write
     }
-    internal class UnauthorizedAccessException : ExectutionError
+    internal class UnauthorizedRegisterException : ExectutionError
     {
         public AccessType acessType { get; private set; }
-        public UnauthorizedAccessException(int line, AccessType accessType, string message = "Unauthorized Access") : base (message, "EE10", line)
+        public UnauthorizedRegisterException(int line, AccessType accessType, string message = "Unauthorized Access") : base (message, "EE10", line)
         {
             this.acessType = accessType;
         }
