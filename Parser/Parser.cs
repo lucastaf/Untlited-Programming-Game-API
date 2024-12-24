@@ -23,6 +23,7 @@ namespace Untlited_Programming_Game.Parser
                 {
                     if (instruction == "" || instruction[0] == '#')
                     {
+                        line++;
                         continue;
                     }
                     Instruction newInstruction = parseInstruction(instruction, line, macros);

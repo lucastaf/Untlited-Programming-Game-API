@@ -40,7 +40,7 @@ namespace Untlited_Programming_Game.Parser
                 int value2;
                 Operation operation;
                 bool isValidOperation = operationMap.TryGetValue(instructionParts[3], out operation);
-                if (isValidOperation) throw new InvalidSimbolException(0, "invalid operation");
+                if (!isValidOperation) throw new InvalidSimbolException(0, "invalid arithmetic operation");
 
                 bool isInt2 = Int32.TryParse(instructionParts[4], out value2);
                 if (!isInt2) isInt2 = macros.TryGetValue(instructionParts[4], out value2);
