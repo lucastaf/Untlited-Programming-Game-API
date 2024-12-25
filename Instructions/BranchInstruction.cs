@@ -57,12 +57,12 @@ namespace Untlited_Programming_Game.Instructions
             {
                 if (typeof(U) == typeof(int))
                 {
-                    int counter = processor.getRegister("Counter");
-                    processor.setRegister("Counter", Convert.ToInt32(Dest) + counter - 1);
+                    int counter = processor.getRegister("Counter", true);
+                    processor.setRegister("Counter", Convert.ToInt32(Dest) + counter - 1, true);
                 }else if (typeof(U) == typeof(string))
                 {
                     int counter = processor.getLabel(Convert.ToString(Dest));
-                    processor.setRegister("Counter", counter - 1);
+                    processor.setRegister("Counter", counter - 1, true);
                 }
             }
 
@@ -80,7 +80,7 @@ namespace Untlited_Programming_Game.Instructions
 
         public override void execute(Processor processor)
         {
-            throw new NotImplementedException();
+            //Manter função vazia
         }
     }
 }

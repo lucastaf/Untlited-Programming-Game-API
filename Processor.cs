@@ -8,7 +8,7 @@ using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game
 {
-    internal class Processor
+    public class Processor
     {
         public class Register
         {
@@ -32,7 +32,7 @@ namespace Untlited_Programming_Game
         public Dictionary<string, Register> Registers { get; private set; } = new Dictionary<string, Register>();
 
         private List<Instruction> Instructions = new List<Instruction>();
-        public void setRegister(string name, int value)
+        public void setRegister(string name, int value, bool forced = false)
         {
             Register? register;
             bool registerExists = Registers.TryGetValue(name, out register);
@@ -42,9 +42,9 @@ namespace Untlited_Programming_Game
             }
             else
             {
-                if (register.writable)
+                if (register.writable || forced)
                 {
-                    onChange(name, value);
+                    if (onRead is not null) onChange(name, value);
                     register.value = value;
                     return;
                 }
@@ -55,7 +55,7 @@ namespace Untlited_Programming_Game
             }
 
         }
-        public int getRegister(string name)
+        public int getRegister(string name, bool forced = false)
         {
             Register? register;
             bool registerExists = Registers.TryGetValue(name, out register);
@@ -65,9 +65,9 @@ namespace Untlited_Programming_Game
             }
             else
             {
-                if (register.readable)
+                if (register.readable || forced)
                 {
-                    onRead(name,  register.value);
+                    if (onRead is not null) onRead(name, register.value);
                     return register.value;
                 }
                 else

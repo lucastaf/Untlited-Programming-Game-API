@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Untlited_Programming_Game.Exceptions
 {
     [Serializable]
-    internal class CodeException : Exception
+    public class CodeException : Exception
     {
         public int line;
         public string code;

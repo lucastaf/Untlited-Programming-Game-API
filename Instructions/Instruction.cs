@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Untlited_Programming_Game.Instructions
 {
-    internal abstract class Instruction
+    public abstract class Instruction
     {
         public Instruction(int line)
         {

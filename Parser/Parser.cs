@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Untlited_Programming_Game.Parser
 {
-    internal static partial class Parser
+    public static partial class Parser
     {
         public static Instruction[] parseProgram(string instructionText, out CodeException[] exceptions)
         {
@@ -81,38 +81,7 @@ namespace Untlited_Programming_Game.Parser
             {"MACRO", parseMacroInstruction},
         };
 
-        private static Instruction parsePrintInstruction(string instructionText, Dictionary<string, int> macros, int line)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
-            return new PrintInstruction(instructionParts[1], line);
-        }
 
-        private static Instruction parseReadInstruction(string instructionText, Dictionary<string, int> macros, int line)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
-            return new ReadInstruction(instructionParts[1], line);
-        }
-
-        private static Instruction parseLabelInstruction(string instructionText, Dictionary<string, int> macros, int line)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
-            return new LabelInstruction(instructionParts[1], line);
-        }
-
-        private static Instruction parseMacroInstruction(string instructionText, Dictionary<string, int> macros, int line)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 3) throw new InvalidSizeException(line);
-            int value;
-            bool isInt = Int32.TryParse(instructionParts[2], out value);
-            if (!isInt) throw new InvalidInputException(line);
-            macros.Add(instructionParts[1], value);
-            return new MacroInstruction(line);
-        }
-    
     }
 
 

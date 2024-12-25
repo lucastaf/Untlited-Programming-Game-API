@@ -8,7 +8,7 @@ using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game.Parser
 {
-    internal static partial class Parser
+    public static partial class Parser
     {
         private static Instruction parseArithmeticInstruction(string instructionText, Dictionary<string, int> macros, int line)
         {
