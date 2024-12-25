@@ -21,6 +21,13 @@ namespace Untlited_Programming_Game
             public bool readable { get; private set; } = true;
         }
 
+
+        public delegate void OnReadDelegate(string register, int value);
+        public delegate void OnChangeDelegate(string register, int value);
+
+        public OnReadDelegate onRead;
+        public OnChangeDelegate onChange;
+
         //Manter publico para fazer as interfaces graficas na UNITY
         public Dictionary<string, Register> Registers { get; private set; } = new Dictionary<string, Register>();
 
@@ -37,6 +44,7 @@ namespace Untlited_Programming_Game
             {
                 if (register.writable)
                 {
+                    onChange(name, value);
                     register.value = value;
                     return;
                 }
@@ -59,6 +67,7 @@ namespace Untlited_Programming_Game
             {
                 if (register.readable)
                 {
+                    onRead(name,  register.value);
                     return register.value;
                 }
                 else
