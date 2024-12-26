@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Untlited_Programming_Game.Instructions;
 using Untlited_Programming_Game.Exceptions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Untlited_Programming_Game.Parser
 {
@@ -17,7 +18,7 @@ namespace Untlited_Programming_Game.Parser
             List<CodeException> errors = new List<CodeException>();
             List<Instruction> instructions = new List<Instruction>();
             Dictionary<string, int> macros = new Dictionary<string, int>();
-            foreach (string instruction in instructionText.ToUpper().Split("\r\n"))
+            foreach (string instruction in Regex.Split(instructionText.ToUpper(), "\r\n|\r|\n"))
             {
                 try
                 {
@@ -46,7 +47,7 @@ namespace Untlited_Programming_Game.Parser
             string[] instructionParts = instructionText.Split(" ");
             try
             {
-                Func<string, Dictionary<string, int>,int, Instruction> parseFunction;
+                Func<string, Dictionary<string, int>, int, Instruction> parseFunction;
                 if (InstructionsCode.TryGetValue(instructionParts[0], out parseFunction))
                 {
                     return parseFunction(instructionText, macros, line);
