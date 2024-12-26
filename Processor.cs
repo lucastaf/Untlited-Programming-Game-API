@@ -76,15 +76,13 @@ namespace Untlited_Programming_Game
                 }
             }
         }
-        public Processor()
+        public Processor((string name, bool readable, bool writable)[] registers)
         {
-            this.Registers.Add("A", new Register(true, true));
-            this.Registers.Add("B", new Register(true, true));
-            this.Registers.Add("C", new Register(true, true));
-            this.Registers.Add("D", new Register(true, true));
+            foreach (var reg in registers)
+            {
+                this.Registers.Add(reg.name, new Register(reg.readable, reg.writable));
+            }
             this.Registers.Add("Counter", new Register(true, false));
-            this.Registers.Add("IN", new Register(true, false));
-            this.Registers.Add("OUT", new Register(false, true));
         }
 
 
@@ -96,6 +94,7 @@ namespace Untlited_Programming_Game
         public void loadProgram(Instruction[] instructions)
         {
             this.Instructions.AddRange(instructions);
+            this.setRegister("Counter", 0, true);
         }
 
         public int getLabel(string label)
