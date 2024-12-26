@@ -18,7 +18,7 @@ namespace Untlited_Programming_Game.Instructions
         public abstract void execute(Processor processor);
     }
 
-    enum Operation
+    public enum Operation
     {
         add,
         sub,
@@ -27,7 +27,7 @@ namespace Untlited_Programming_Game.Instructions
         mod
     }
 
-    enum Branch
+    public enum Branch
     {
         beq,
         bne,
@@ -37,7 +37,7 @@ namespace Untlited_Programming_Game.Instructions
         bge,
     }
 
-    internal class PrintInstruction : Instruction
+    public class PrintInstruction : Instruction
     {
         private string reg;
         public PrintInstruction(string reg, int line) : base(line)
@@ -51,7 +51,7 @@ namespace Untlited_Programming_Game.Instructions
         }
     }
 
-    internal class ReadInstruction : Instruction
+    public class ReadInstruction : Instruction
     {
         private string reg;
         public ReadInstruction(string reg, int line) : base(line)
@@ -61,13 +61,13 @@ namespace Untlited_Programming_Game.Instructions
 
         public override void execute(Processor processor)
         {
-            string resultString = Console.ReadLine();
+            string resultString = Console.ReadLine() ?? "";
             int result = Int32.Parse(resultString);
             processor.setRegister(this.reg, result);
         }
     }
 
-    internal class MacroInstruction : Instruction
+    public class MacroInstruction : Instruction
     {
         public MacroInstruction(int line) : base(line) { }
         public override void execute(Processor processor)

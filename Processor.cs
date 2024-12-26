@@ -78,7 +78,6 @@ namespace Untlited_Programming_Game
         }
         public Processor()
         {
-            this.Registers.Add("ZERO", new Register(true, false));
             this.Registers.Add("A", new Register(true, true));
             this.Registers.Add("B", new Register(true, true));
             this.Registers.Add("C", new Register(true, true));

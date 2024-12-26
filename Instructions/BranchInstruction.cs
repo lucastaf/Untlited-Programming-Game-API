@@ -7,7 +7,7 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Untlited_Programming_Game.Instructions
 {
-    internal class BranchInstruction<T, U> : Instruction
+    public class BranchInstruction<T, U> : Instruction where T : notnull where U : notnull
     {
         private Branch BranchType;
         private string RS1;
@@ -37,11 +37,11 @@ namespace Untlited_Programming_Game.Instructions
             bool Valid;
             if (typeof(T) == typeof(string))
             {
-                value2 = processor.getRegister(Convert.ToString(RS2));
+                value2 = processor.getRegister((string)(object)RS2);
             }
             else
             {
-                value2 = Convert.ToInt32(RS2);
+                value2 = (int)(object)RS2;
             }
             switch (BranchType)
             {
@@ -58,10 +58,10 @@ namespace Untlited_Programming_Game.Instructions
                 if (typeof(U) == typeof(int))
                 {
                     int counter = processor.getRegister("Counter", true);
-                    processor.setRegister("Counter", Convert.ToInt32(Dest) + counter - 1, true);
+                    processor.setRegister("Counter", (int)(object)Dest + counter - 1, true);
                 }else if (typeof(U) == typeof(string))
                 {
-                    int counter = processor.getLabel(Convert.ToString(Dest));
+                    int counter = processor.getLabel((string)(object)Dest);
                     processor.setRegister("Counter", counter - 1, true);
                 }
             }
@@ -69,7 +69,7 @@ namespace Untlited_Programming_Game.Instructions
         }
     }
 
-    internal class LabelInstruction : Instruction
+    public class LabelInstruction : Instruction
     {
         public LabelInstruction(string label, int line) : base(line)
         {

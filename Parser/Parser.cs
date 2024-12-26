@@ -75,8 +75,9 @@ namespace Untlited_Programming_Game.Parser
         private static readonly Dictionary<string, Func<string, Dictionary<string, int>, int, Instruction>> InstructionsCode = new Dictionary<string, Func<string, Dictionary<string, int>, int, Instruction>>()
         {
             {"IF", parseBranchInstruction },
-            {"PRINT", parsePrintInstruction },
-            {"READ", parseReadInstruction},
+            //Desativados funções de print e READ pois não serão usadas no game final
+            //{"PRINT", parsePrintInstruction },
+            //{"READ", parseReadInstruction},
             {"LABEL", parseLabelInstruction },
             {"MACRO", parseMacroInstruction},
         };

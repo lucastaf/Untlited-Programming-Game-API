@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Untlited_Programming_Game.Instructions
 {
 
-    internal class AssignInstruction<T> : Instruction
+    public class AssignInstruction<T> : Instruction
     {
         private T RS1;
         private string RD;
@@ -24,16 +24,16 @@ namespace Untlited_Programming_Game.Instructions
             int value;
             if(this.RS1 is int)
             {
-                value = Convert.ToInt32(this.RS1);
+                value = (int)(object)this.RS1;
             }
             else
             {
-                value = processor.getRegister(Convert.ToString(this.RS1));
+                value = processor.getRegister((string)(object)this.RS1);
             }
             processor.setRegister(this.RD, value);
         }
     }
-    internal class ArithmeticInstruction<T, U> : Instruction
+    public class ArithmeticInstruction<T, U> : Instruction
     {
 
         //Manter T e U como generics por conta de operações de divisão
@@ -48,6 +48,7 @@ namespace Untlited_Programming_Game.Instructions
         {
             if ((typeof(T) != typeof(string) && typeof(T) != typeof(int)) || (typeof(U) != typeof(string) && typeof(U) != typeof(int)))
             {
+                //Não será gerada quando for usar o código pois é revalidado pelo parser
                 throw new InvalidOperationException("Uma instrução aritmética só pode possuir int ou string para RS1 e RS2");
             }
             this.RS1 = RS1;
@@ -62,19 +63,19 @@ namespace Untlited_Programming_Game.Instructions
             int result;
             if (this.RS1 is int)
             {
-                value1 = Convert.ToInt32(this.RS1);
+                value1 = (int)(object)this.RS1;
             }
             else
             {
-                value1 = processor.getRegister(Convert.ToString(this.RS1));
+                value1 = processor.getRegister((string)(object)this.RS1);
             }
             if (this.RS2 is int)
             {
-                value2 = Convert.ToInt32(this.RS2);
+                value2 = (int)(object)this.RS2;
             }
             else
             {
-                value2 = processor.getRegister(Convert.ToString(this.RS2));
+                value2 = processor.getRegister((string)(object)this.RS2);
             }
             switch (operation)
             {
