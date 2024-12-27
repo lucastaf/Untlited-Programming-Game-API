@@ -130,6 +130,17 @@ namespace Untlited_Programming_Game
             }
         }
 
+        public int getCurrentLine()
+        {
+            Instruction currentIntrustion = this.Instructions[Registers["Counter"].value];
+            return currentIntrustion.line;
+        }
+
+        public Instruction getInstruction(int index)
+        {
+            return this.Instructions[index];
+        }
+
         public void RunTillFinish()
         {
             while (this.Registers["Counter"].value < this.Instructions.Count)
