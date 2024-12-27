@@ -28,7 +28,7 @@ namespace Untlited_Programming_Game.Parser
                         continue;
                     }
                     Instruction newInstruction = parseInstruction(instruction, line, macros);
-                    if (newInstruction is not MacroInstruction)
+                    if (!(newInstruction is MacroInstruction))
                     {
                         instructions.Add(newInstruction);
                     }

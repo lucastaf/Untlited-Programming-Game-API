@@ -44,7 +44,7 @@ namespace Untlited_Programming_Game
             {
                 if (register.writable || forced)
                 {
-                    if (onRead is not null) onChange(name, value);
+                    if (onRead != null) onChange(name, value);
                     register.value = value;
                     return;
                 }
@@ -67,7 +67,7 @@ namespace Untlited_Programming_Game
             {
                 if (register.readable || forced)
                 {
-                    if (onRead is not null) onRead(name, register.value);
+                    if (onRead != null) onRead(name, register.value);
                     return register.value;
                 }
                 else
