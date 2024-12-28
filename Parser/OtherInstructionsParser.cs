@@ -8,30 +8,23 @@ using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game.Parser
 {
-    public static partial class Parser
+    public partial class Parser
     {
-        private static Instruction parsePrintInstruction(string instructionText, Dictionary<string, int> macros, int line)
+        private Instruction parsePrintInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 2) throw new InvalidSizeException(line);
             return new PrintInstruction(instructionParts[1], line);
         }
 
-        private static Instruction parseReadInstruction(string instructionText, Dictionary<string, int> macros, int line)
+        private Instruction parseReadInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 2) throw new InvalidSizeException(line);
             return new ReadInstruction(instructionParts[1], line);
         }
 
-        private static Instruction parseLabelInstruction(string instructionText, Dictionary<string, int> macros, int line)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
-            return new LabelInstruction(instructionParts[1], line);
-        }
-
-        private static Instruction parseMacroInstruction(string instructionText, Dictionary<string, int> macros, int line)
+        private Instruction parseMacroInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 3) throw new InvalidSizeException(line);

@@ -25,12 +25,21 @@ namespace Untlited_Programming_Game
         public delegate void OnReadDelegate(string register, int value);
         public delegate void OnChangeDelegate(string register, int value);
 
-        public OnReadDelegate onRead;
-        public OnChangeDelegate onChange;
+        public OnReadDelegate? onRead;
+        public OnChangeDelegate? onChange;
 
         //Manter publico para fazer as interfaces graficas na UNITY
         public Dictionary<string, Register> Registers { get; private set; } = new Dictionary<string, Register>();
 
+        public Processor((string name, bool readable, bool writable)[] registers)
+        {
+            foreach (var reg in registers)
+            {
+                this.Registers.Add(reg.name, new Register(reg.readable, reg.writable));
+            }
+            this.Registers.Add("Counter", new Register(true, false));
+
+        }
         private List<Instruction> Instructions = new List<Instruction>();
         public void setRegister(string name, int value, bool forced = false)
         {
@@ -76,26 +85,6 @@ namespace Untlited_Programming_Game
                 }
             }
         }
-        public Processor((string name, bool readable, bool writable)[] registers)
-        {
-            foreach (var reg in registers)
-            {
-                this.Registers.Add(reg.name, new Register(reg.readable, reg.writable));
-            }
-            this.Registers.Add("Counter", new Register(true, false));
-        }
-
-
-        public void addInstruction(Instruction instruction)
-        {
-            this.Instructions.Add(instruction);
-        }
-
-        public void loadProgram(Instruction[] instructions)
-        {
-            this.Instructions.AddRange(instructions);
-            this.setRegister("Counter", 0, true);
-        }
 
         public int getLabel(string label)
         {
@@ -113,6 +102,27 @@ namespace Untlited_Programming_Game
                 index++;
             }
             throw new InvalidLabelException(0);
+        }
+
+        public void addInstruction(Instruction instruction)
+        {
+            for (int i = 0; i < this.Instructions.Count; i++)
+            {
+                Instruction currentInstruction = this.Instructions[i];
+                if (instruction.line < currentInstruction.line)
+                {
+                    this.Instructions.Insert(i, currentInstruction);
+                    return;
+                }
+            }
+            this.Instructions.Add(instruction);
+        }
+
+        public void loadProgram(Instruction[] instructions)
+        {
+            this.Instructions.Clear();
+            this.Instructions.AddRange(instructions);
+            this.setRegister("Counter", 0, true);
         }
 
         public void Execute()
@@ -148,16 +158,6 @@ namespace Untlited_Programming_Game
                 this.Execute();
             }
         }
-
-        public void Print()
-        {
-            foreach (var register in this.Registers)
-            {
-                Console.WriteLine($"{register.Key} = {register.Value.value}");
-            }
-        }
-
-
 
 
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Untlited_Programming_Game.Instructions
 {
@@ -61,6 +62,21 @@ namespace Untlited_Programming_Game.Instructions
                 }
             }
 
+        }
+    }
+
+    public class GotoInstruction : Instruction
+    {
+        private string label;
+        public GotoInstruction(string label, int line) : base(line)
+        {
+            this.label = label;
+        }
+
+        public override void execute(Processor processor)
+        {
+            int labelCount = processor.getLabel(label);
+            processor.setRegister("Counter", labelCount - 1, true);
         }
     }
 

@@ -8,9 +8,9 @@ using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game.Parser
 {
-    public static partial class Parser
+    public partial class Parser
     {
-        private static Instruction parseArithmeticInstruction(string instructionText, Dictionary<string, int> macros, int line)
+        private Instruction parseArithmeticInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             int instructionSize = instructionParts.Length;

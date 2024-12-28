@@ -8,9 +8,9 @@ using Untlited_Programming_Game.Instructions;
 
 namespace Untlited_Programming_Game.Parser
 {
-    public static partial class Parser
+    public partial class Parser
     {
-        private static Instruction parseBranchInstruction(string instructionText, Dictionary<string, int> macros, int line)
+        private Instruction parseBranchInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 6) throw new InvalidSizeException(line);
@@ -42,7 +42,7 @@ namespace Untlited_Programming_Game.Parser
                 int dest;
                 bool isDestInt = Int32.TryParse(instructionParts[5], out dest);
                 if (!isDestInt) isDestInt = macros.TryGetValue(instructionParts[5], out dest);
-                if (!isDestInt) throw new InvalidInputException(line,"Last argument of an JUMP branch must be an number");
+                if (!isDestInt) throw new InvalidInputException(line, "Last argument of an JUMP branch must be an number");
                 if (isInt2)
                     return new BranchInstruction<int, int>(branchType, instructionParts[1], value2, dest, line);
                 else
@@ -52,6 +52,20 @@ namespace Untlited_Programming_Game.Parser
             {
                 throw new InvalidSimbolException(line, "Branch instruction must be of type GOTO or JUMP");
             }
+        }
+
+        private Instruction parseLabelInstruction(string instructionText, int line)
+        {
+            string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
+            return new LabelInstruction(instructionParts[1], line);
+        }
+
+        private Instruction parseGotoInstruction(string instructionText, int line)
+        {
+            string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
+            return new GotoInstruction(instructionParts[1], line);
         }
 
     }

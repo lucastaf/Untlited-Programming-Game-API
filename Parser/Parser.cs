@@ -7,16 +7,41 @@ using Untlited_Programming_Game.Instructions;
 using Untlited_Programming_Game.Exceptions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml.Schema;
 
 namespace Untlited_Programming_Game.Parser
 {
-    public static partial class Parser
+    public partial class Parser
     {
-        public static Instruction[] parseProgram(string instructionText, out CodeException[] exceptions)
+        public Parser()
         {
+            InstructionsCode = new Dictionary<string, Func<string, int, Instruction>>()
+            {
+                {"IF", parseBranchInstruction },
+                //Desativados funções de print e READ pois não serão usadas no game final
+                //{"PRINT", parsePrintInstruction },
+                //{"READ", parseReadInstruction},
+                {"LABEL", parseLabelInstruction },
+                {"MACRO", parseMacroInstruction},
+                {"GOTO", parseGotoInstruction},
+            };
+        }
+
+        private readonly Dictionary<string, Func<string, int, Instruction>> InstructionsCode;
+
+        public List<Instruction> Instructions = new List<Instruction>();
+
+        public List<CodeException> Exceptions = new List<CodeException>();
+
+        private Dictionary<string, int> macros = new Dictionary<string, int>();
+
+        public Instruction[] parseProgram(string instructionText)
+        {
+            this.Instructions.Clear();
+            this.Exceptions.Clear();
+
+
             int line = 0;
-            List<CodeException> errors = new List<CodeException>();
-            List<Instruction> instructions = new List<Instruction>();
             Dictionary<string, int> macros = new Dictionary<string, int>();
             foreach (string instruction in Regex.Split(instructionText.ToUpper(), "\r\n|\r|\n"))
             {
@@ -27,34 +52,34 @@ namespace Untlited_Programming_Game.Parser
                         line++;
                         continue;
                     }
-                    Instruction newInstruction = parseInstruction(instruction, line, macros);
+                    Instruction newInstruction = parseInstruction(instruction, line);
                     if (!(newInstruction is MacroInstruction))
                     {
-                        instructions.Add(newInstruction);
+                        Instructions.Add(newInstruction);
                     }
                 }
                 catch (CodeException e)
                 {
-                    errors.Add(e);
+                    Exceptions.Add(e);
                 }
                 line++;
             }
-            exceptions = errors.ToArray();
-            return instructions.ToArray();
+            return Instructions.ToArray();
         }
-        public static Instruction parseInstruction(string instructionText, int line, Dictionary<string, int> macros)
+
+        public Instruction parseInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             try
             {
-                Func<string, Dictionary<string, int>, int, Instruction> parseFunction;
+                Func<string, int, Instruction> parseFunction;
                 if (InstructionsCode.TryGetValue(instructionParts[0], out parseFunction))
                 {
-                    return parseFunction(instructionText, macros, line);
+                    return parseFunction(instructionText, line);
                 }
                 else if (instructionParts[1] == "=")
                 {
-                    return parseArithmeticInstruction(instructionText, macros, line);
+                    return parseArithmeticInstruction(instructionText, line);
                 }
                 else
                 {
@@ -73,15 +98,25 @@ namespace Untlited_Programming_Game.Parser
             }
         }
 
-        private static readonly Dictionary<string, Func<string, Dictionary<string, int>, int, Instruction>> InstructionsCode = new Dictionary<string, Func<string, Dictionary<string, int>, int, Instruction>>()
+        public void addInstruction(Instruction instruction)
         {
-            {"IF", parseBranchInstruction },
-            //Desativados funções de print e READ pois não serão usadas no game final
-            //{"PRINT", parsePrintInstruction },
-            //{"READ", parseReadInstruction},
-            {"LABEL", parseLabelInstruction },
-            {"MACRO", parseMacroInstruction},
-        };
+            for (int i = 0; i < this.Instructions.Count; i++)
+            {
+                Instruction currentInstruction = this.Instructions[i];
+                if (Exceptions[i].line == instruction.line)
+                {
+                    Exceptions.RemoveAt(i);
+                }
+                if (instruction.line < currentInstruction.line)
+                {
+                    this.Instructions.Insert(i, currentInstruction);
+                    return;
+                }
+            }
+            this.Instructions.Add(instruction);
+
+        }
+
 
 
     }
