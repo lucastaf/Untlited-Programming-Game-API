@@ -86,24 +86,6 @@ namespace Untlited_Programming_Game
             }
         }
 
-        public int getLabel(string label)
-        {
-            int index = 0;
-            foreach (var instruction in this.Instructions)
-            {
-                if (instruction is LabelInstruction)
-                {
-                    if (((LabelInstruction)instruction).label == label)
-                    {
-                        return index;
-                    }
-                }
-
-                index++;
-            }
-            throw new InvalidLabelException(0);
-        }
-
         public void addInstruction(Instruction instruction)
         {
             for (int i = 0; i < this.Instructions.Count; i++)

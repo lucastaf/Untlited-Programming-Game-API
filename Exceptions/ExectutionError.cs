@@ -28,9 +28,5 @@ namespace Untlited_Programming_Game.Exceptions
         }
     }
 
-    public class InvalidLabelException : ExectutionError {
-        public InvalidLabelException(int line) : base("Invalid label", "EE20", line) { }
-    }
-
 
 }

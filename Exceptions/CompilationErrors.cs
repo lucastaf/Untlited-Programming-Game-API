@@ -34,4 +34,9 @@ namespace Untlited_Programming_Game.Exceptions
         public InvalidSimbolException(int line, string message = "Invalid Symbol") : base(message, "CE21", line) { }
     }
 
+    public class InvalidLabelException : CompilationError
+    {
+        public InvalidLabelException(int line, string message = "Invalid Label") : base(message, "CE22", line) { }
+    }
+
 }

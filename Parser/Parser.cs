@@ -8,6 +8,7 @@ using Untlited_Programming_Game.Exceptions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Schema;
+using System.Collections.ObjectModel;
 
 namespace Untlited_Programming_Game.Parser
 {
@@ -18,12 +19,10 @@ namespace Untlited_Programming_Game.Parser
             InstructionsCode = new Dictionary<string, Func<string, int, Instruction>>()
             {
                 {"IF", parseBranchInstruction },
-                //Desativados funções de print e READ pois não serão usadas no game final
-                //{"PRINT", parsePrintInstruction },
-                //{"READ", parseReadInstruction},
-                {"LABEL", parseLabelInstruction },
-                {"MACRO", parseMacroInstruction},
                 {"GOTO", parseGotoInstruction},
+                //Desativados funções de print e READ pois não serão usadas no game final
+                {"PRINT", parsePrintInstruction },
+                {"READ", parseReadInstruction},
             };
         }
 
@@ -34,17 +33,21 @@ namespace Untlited_Programming_Game.Parser
         public List<CodeException> Exceptions = new List<CodeException>();
 
         private Dictionary<string, int> macros = new Dictionary<string, int>();
+        private Dictionary<string, int> labels = new Dictionary<string, int>();
 
         public Instruction[] parseProgram(string instructionText)
         {
             this.Instructions.Clear();
             this.Exceptions.Clear();
+            this.macros.Clear();
+            this.labels.Clear();
+            instructionText = instructionText.ToUpper();
 
-
+            this.parseCompilationVariables(instructionText);
             int line = 0;
-            Dictionary<string, int> macros = new Dictionary<string, int>();
-            foreach (string instruction in Regex.Split(instructionText.ToUpper(), "\r\n|\r|\n"))
+            foreach (string instruction in Regex.Split(instructionText, "\r\n|\r|\n"))
             {
+                instruction.Trim();
                 try
                 {
                     if (instruction == "" || instruction[0] == '#')
@@ -52,10 +55,10 @@ namespace Untlited_Programming_Game.Parser
                         line++;
                         continue;
                     }
-                    Instruction newInstruction = parseInstruction(instruction, line);
-                    if (!(newInstruction is MacroInstruction))
+                    Instruction? newInstruction = parseInstruction(instruction, line);
+                    if (!(newInstruction is null))
                     {
-                        Instructions.Add(newInstruction);
+                        this.Instructions.Add(newInstruction);
                     }
                 }
                 catch (CodeException e)
@@ -64,12 +67,16 @@ namespace Untlited_Programming_Game.Parser
                 }
                 line++;
             }
-            return Instructions.ToArray();
+            return this.Instructions.ToArray();
         }
 
-        public Instruction parseInstruction(string instructionText, int line)
+        public Instruction? parseInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts[0] == "LABEL" || instructionParts[0] == "MACRO")
+            {
+                return null;
+            }
             try
             {
                 Func<string, int, Instruction> parseFunction;
@@ -117,7 +124,45 @@ namespace Untlited_Programming_Game.Parser
 
         }
 
+        private List<string> parseCompilationVariables(string instructionText)
+        {
+            List<string> instructions = new List<string>(Regex.Split(instructionText, "\r\n|\r|\n"));
+            int instructionCount = 0;
 
+            for (int i = 0; i < instructions.Count; i++) {
+                string instruction = instructions[i];
+                instruction = instruction.Trim();
+                if(instruction == "" || instruction[0] == '#')
+                {
+                    continue;
+                }
+                else
+                {
+                    try
+                    {
+
+                    string[] instructionParts = instruction.Split(" ");
+                    if (instructionParts[0] == "LABEL")
+                    {
+                        parseLabelInstruction(instruction, instructionCount, i);
+                        continue;
+                    }
+                    else if(instructionParts[0] == "MACRO")
+                    {
+                        parseMacroInstruction(instruction, i);
+                        continue;
+                    }
+                    }catch(CompilationError e)
+                    {
+                        Exceptions.Add(e);
+                    }
+                }
+                instructionCount++;
+            }
+
+            return instructions;
+
+        }
 
     }
 

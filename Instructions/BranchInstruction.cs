@@ -3,27 +3,23 @@ using System.Reflection;
 
 namespace Untlited_Programming_Game.Instructions
 {
-    public class BranchInstruction<T, U> : Instruction where T : notnull where U : notnull
+    public class BranchInstruction<T> : Instruction where T : notnull
     {
         private Branch BranchType;
         private string RS1;
         private T RS2;
-        private U Dest;
+        private int dest;
 
-        public BranchInstruction(Branch branchType, string rS1, T rS2, U dest, int line) : base(line)
+        public BranchInstruction(Branch branchType, string rS1, T rS2, int dest, int line) : base(line)
         {
             if ((typeof(T) != typeof(string) && typeof(T) != typeof(int)))
             {
                 throw new InvalidOperationException("Uma instrução de Branch só pode possuir int ou string para RS2");
             }
-            if ((typeof(U) != typeof(string) && typeof(U) != typeof(int)))
-            {
-                throw new InvalidOperationException("Uma instrução de Branch só pode possuir int ou string para Destino");
-            }
             BranchType = branchType;
             RS1 = rS1;
             RS2 = rS2;
-            Dest = dest;
+            this.dest = dest;
         }
 
         public override void execute(Processor processor)
@@ -51,15 +47,7 @@ namespace Untlited_Programming_Game.Instructions
             }
             if (Valid)
             {
-                if (typeof(U) == typeof(int))
-                {
-                    int counter = processor.getRegister("Counter", true);
-                    processor.setRegister("Counter", (int)(object)Dest + counter - 1, true);
-                }else if (typeof(U) == typeof(string))
-                {
-                    int counter = processor.getLabel((string)(object)Dest);
-                    processor.setRegister("Counter", counter - 1, true);
-                }
+              processor.setRegister("Counter", dest - 1, true);
             }
 
         }
@@ -68,30 +56,16 @@ namespace Untlited_Programming_Game.Instructions
     public class GotoInstruction : Instruction
     {
         private string label;
-        public GotoInstruction(string label, int line) : base(line)
+        private int dest;
+        public GotoInstruction(string label, int line, int dest) : base(line)
         {
             this.label = label;
+            this.dest = dest;
         }
 
         public override void execute(Processor processor)
         {
-            int labelCount = processor.getLabel(label);
-            processor.setRegister("Counter", labelCount - 1, true);
-        }
-    }
-
-    public class LabelInstruction : Instruction
-    {
-        public LabelInstruction(string label, int line) : base(line)
-        {
-            this.label = label;
-        }
-
-        public string label { get; private set; }
-
-        public override void execute(Processor processor)
-        {
-            //Manter função vazia
+            processor.setRegister("Counter", dest - 1, true);
         }
     }
 }

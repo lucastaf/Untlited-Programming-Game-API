@@ -28,25 +28,17 @@ namespace Untlited_Programming_Game.Parser
                 {">=", Branch.bge }
             };
             Branch branchType;
+            int destination;
             bool isBranchValid = branchMap.TryGetValue(instructionParts[2], out branchType);
             if (!isBranchValid) throw new InvalidSimbolException(line, "Invalid comparison");
+            bool isDestValid = labels.TryGetValue(instructionParts[5], out destination);
+            if (!isDestValid) throw new InvalidLabelException(line);
             if (instructionParts[4] == "GOTO")
             {
                 if (isInt2)
-                    return new BranchInstruction<int, string>(branchType, instructionParts[1], value2, instructionParts[5], line);
+                    return new BranchInstruction<int>(branchType, instructionParts[1], value2, destination, line);
                 else
-                    return new BranchInstruction<string, string>(branchType, instructionParts[1], instructionParts[3], instructionParts[5], line);
-            }
-            else if (instructionParts[4] == "JUMP")
-            {
-                int dest;
-                bool isDestInt = Int32.TryParse(instructionParts[5], out dest);
-                if (!isDestInt) isDestInt = macros.TryGetValue(instructionParts[5], out dest);
-                if (!isDestInt) throw new InvalidInputException(line, "Last argument of an JUMP branch must be an number");
-                if (isInt2)
-                    return new BranchInstruction<int, int>(branchType, instructionParts[1], value2, dest, line);
-                else
-                    return new BranchInstruction<string, int>(branchType, instructionParts[1], instructionParts[3], dest, line);
+                    return new BranchInstruction<string>(branchType, instructionParts[1], instructionParts[3], destination, line);
             }
             else
             {
@@ -54,18 +46,14 @@ namespace Untlited_Programming_Game.Parser
             }
         }
 
-        private Instruction parseLabelInstruction(string instructionText, int line)
-        {
-            string[] instructionParts = instructionText.Split(" ");
-            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
-            return new LabelInstruction(instructionParts[1], line);
-        }
-
         private Instruction parseGotoInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 2) throw new InvalidSizeException(line);
-            return new GotoInstruction(instructionParts[1], line);
+            int destination;
+            bool isDestValid = labels.TryGetValue(instructionParts[6], out destination);
+            if (!isDestValid) throw new InvalidLabelException(line);
+            return new GotoInstruction(instructionParts[1], line, destination);
         }
 
     }

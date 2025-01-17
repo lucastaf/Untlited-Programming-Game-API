@@ -24,7 +24,7 @@ namespace Untlited_Programming_Game.Parser
             return new ReadInstruction(instructionParts[1], line);
         }
 
-        private Instruction parseMacroInstruction(string instructionText, int line)
+        private void parseMacroInstruction(string instructionText, int line)
         {
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 3) throw new InvalidSizeException(line);
@@ -32,7 +32,13 @@ namespace Untlited_Programming_Game.Parser
             bool isInt = Int32.TryParse(instructionParts[2], out value);
             if (!isInt) throw new InvalidInputException(line);
             macros.Add(instructionParts[1], value);
-            return new MacroInstruction(line);
+        }
+
+        private void parseLabelInstruction(string instructionText, int index, int line)
+        {
+            string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length != 2) throw new InvalidSizeException(line);
+            this.labels.Add(instructionParts[1], index);
         }
 
     }
