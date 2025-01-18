@@ -51,7 +51,7 @@ namespace Untlited_Programming_Game.Parser
             string[] instructionParts = instructionText.Split(" ");
             if (instructionParts.Length != 2) throw new InvalidSizeException(line);
             int destination;
-            bool isDestValid = labels.TryGetValue(instructionParts[6], out destination);
+            bool isDestValid = labels.TryGetValue(instructionParts[1], out destination);
             if (!isDestValid) throw new InvalidLabelException(line);
             return new GotoInstruction(instructionParts[1], line, destination);
         }
