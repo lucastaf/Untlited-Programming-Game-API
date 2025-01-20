@@ -24,9 +24,13 @@ namespace Untlited_Programming_Game
 
         public delegate void OnReadDelegate(string register, int value);
         public delegate void OnChangeDelegate(string register, int value);
+        public delegate void OnInstructionEnd(Instruction instruction);
+        public delegate void OnEnd();
 
         public OnReadDelegate? onRead;
         public OnChangeDelegate? onChange;
+        public OnEnd? onEnd;
+        public OnInstructionEnd? onInstructionEnd;
 
         //Manter publico para fazer as interfaces graficas na UNITY
         public Dictionary<string, Register> Registers { get; private set; } = new Dictionary<string, Register>();
@@ -40,6 +44,7 @@ namespace Untlited_Programming_Game
             this.Registers.Add("Counter", new Register(true, false));
 
         }
+
         private List<Instruction> Instructions = new List<Instruction>();
         public void setRegister(string name, int value, bool forced = false)
         {
@@ -64,6 +69,7 @@ namespace Untlited_Programming_Game
             }
 
         }
+
         public int getRegister(string name, bool forced = false)
         {
             Register? register;
@@ -107,13 +113,24 @@ namespace Untlited_Programming_Game
             this.setRegister("Counter", 0, true);
         }
 
-        public void Execute()
+        public bool Execute()
         {
-            Instruction instruction = this.Instructions[Registers["Counter"].value];
+            Instruction instruction;
+            if (this.Registers["Counter"].value < this.Instructions.Count)
+                instruction = this.Instructions[Registers["Counter"].value];
+            else
+            {
+                if (!(onEnd is null)) onEnd();
+                return false;
+            }
+
             try
             {
                 instruction.execute(this);
+                if (!(onInstructionEnd is null))
+                    onInstructionEnd(instruction);
                 this.Registers["Counter"].value++;
+                return true;
             }
             catch (CodeException e)
             {
@@ -141,6 +158,13 @@ namespace Untlited_Programming_Game
             }
         }
 
+        public void Clear()
+        {
+            foreach (var register in this.Registers)
+            {
+                register.Value.value = 0;
+            }
+        }
 
     }
 }
