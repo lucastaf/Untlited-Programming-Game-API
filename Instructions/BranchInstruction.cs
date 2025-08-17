@@ -47,11 +47,14 @@ namespace Untlited_Programming_Game.Instructions
             }
             if (Valid)
             {
-              processor.setRegister("Counter", dest - 1, true);
+                processor.setRegister("RA", processor.getRegister("Counter", true), true);
+                processor.setRegister("Counter", dest - 1, true);
             }
 
         }
     }
+
+
 
     public class GotoInstruction : Instruction
     {
@@ -65,7 +68,31 @@ namespace Untlited_Programming_Game.Instructions
 
         public override void execute(Processor processor)
         {
+            processor.setRegister("RA", processor.getRegister("Counter", true), true);
             processor.setRegister("Counter", dest - 1, true);
+        }
+    }
+
+    public class ReturnInstruction : Instruction
+    {
+        private string? ReturnReg;
+        public ReturnInstruction(string? returnReg, int line) : base(line)
+        {
+            if (ReturnReg != null) this.ReturnReg = returnReg;
+        }
+
+        public override void execute(Processor processor)
+        {
+            int returnPoint;
+            if (ReturnReg != null)
+            {
+                returnPoint = processor.getRegister(ReturnReg, true);
+            }
+            else
+            {
+                returnPoint = processor.getRegister("RA", true);
+            }
+            processor.setRegister("Counter", returnPoint, true);
         }
     }
 }

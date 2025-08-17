@@ -37,6 +37,15 @@ namespace Untlited_Programming_Game.Instructions
         bge,
     }
 
+    public class BreakInstruction : Instruction
+    {
+        public BreakInstruction(int line) : base(line) { }
+
+        public override void execute(Processor processor)
+        {
+            processor.onPause?.Invoke();
+        }
+    }
     public class PrintInstruction : Instruction
     {
         private string reg;

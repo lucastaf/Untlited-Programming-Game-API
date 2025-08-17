@@ -56,5 +56,13 @@ namespace Untlited_Programming_Game.Parser
             return new GotoInstruction(instructionParts[1], line, destination);
         }
 
+        private Instruction parseReturnInstruction(string instructionText, int line)
+        {
+            string[] instructionParts = instructionText.Split(" ");
+            if (instructionParts.Length > 2) throw new InvalidSizeException(line);
+            return new ReturnInstruction(instructionParts.Length == 2 ? instructionParts[1] : null, line);
+
+        }
+
     }
 }

@@ -13,7 +13,16 @@ namespace Untlited_Programming_Game
             Parser.Parser parser = new Parser.Parser();
             Instructions.Instruction[] instructions = parser.parseProgram(text);
             processor.loadProgram(instructions);
-            processor.RunTillFinish();
+            bool running = true;
+            processor.onEnd += () =>
+            {
+                running = false;
+            };
+            while (running)
+            {
+                processor.Execute();
+                Console.WriteLine(processor.getCurrentLine());
+            }
 
 
         }

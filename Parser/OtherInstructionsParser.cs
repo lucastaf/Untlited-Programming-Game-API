@@ -41,5 +41,9 @@ namespace Untlited_Programming_Game.Parser
             this.labels.Add(instructionParts[1], index);
         }
 
+        private Instruction parseBrakeInstruction(string instructionText, int line)
+        {
+            return new BreakInstruction(line);
+        }
     }
 }

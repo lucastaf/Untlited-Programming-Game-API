@@ -23,6 +23,8 @@ namespace Untlited_Programming_Game.Parser
                 //Desativados funções de print e READ pois não serão usadas no game final
                 {"PRINT", parsePrintInstruction },
                 {"READ", parseReadInstruction},
+                {"RETURN" , parseReturnInstruction},
+                {"BREAK", parseBrakeInstruction }
             };
         }
 

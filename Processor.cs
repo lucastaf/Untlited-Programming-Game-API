@@ -24,13 +24,17 @@ namespace Untlited_Programming_Game
 
         public delegate void OnReadDelegate(string register, int value);
         public delegate void OnChangeDelegate(string register, int value);
-        public delegate void OnInstructionEnd(Instruction instruction);
-        public delegate void OnEnd();
+        public delegate void OnInstructionEnd(List<(string register, int value)> registersReaded, List<(string register, int value)> registersWritten, Instruction instruction);
+        public delegate void Handler();
 
         public OnReadDelegate? onRead;
         public OnChangeDelegate? onChange;
-        public OnEnd? onEnd;
+        public Handler? onEnd;
+        public Handler? onPause;
         public OnInstructionEnd? onInstructionEnd;
+
+        private List<(string, int)> registersReaded = new List<(string, int)>();
+        private List<(string, int)> registersWritten = new List<(string, int)>();
 
         //Manter publico para fazer as interfaces graficas na UNITY
         public Dictionary<string, Register> Registers { get; private set; } = new Dictionary<string, Register>();
@@ -42,6 +46,7 @@ namespace Untlited_Programming_Game
                 this.Registers.Add(reg.name, new Register(reg.readable, reg.writable));
             }
             this.Registers.Add("Counter", new Register(true, false));
+            this.Registers.Add("RA", new Register(true, true));
 
         }
 
@@ -58,7 +63,8 @@ namespace Untlited_Programming_Game
             {
                 if (register.writable || forced)
                 {
-                    if (onRead != null) onChange(name, value);
+                    onChange?.Invoke(name, value);
+                    registersWritten.Add((name, value));
                     register.value = value;
                     return;
                 }
@@ -82,7 +88,8 @@ namespace Untlited_Programming_Game
             {
                 if (register.readable || forced)
                 {
-                    if (onRead != null) onRead(name, register.value);
+                    onRead?.Invoke(name, register.value);
+                    this.registersReaded.Add((name, register.value));
                     return register.value;
                 }
                 else
@@ -120,15 +127,17 @@ namespace Untlited_Programming_Game
                 instruction = this.Instructions[Registers["Counter"].value];
             else
             {
-                if (!(onEnd is null)) onEnd();
                 return false;
             }
 
             try
             {
                 instruction.execute(this);
-                if (!(onInstructionEnd is null))
-                    onInstructionEnd(instruction);
+                if (this.Registers["Counter"].value == this.Instructions.Count - 1)
+                    onEnd?.Invoke();
+                onInstructionEnd?.Invoke(registersReaded, registersWritten, instruction);
+                registersReaded.Clear();
+                registersWritten.Clear();
                 this.Registers["Counter"].value++;
                 return true;
             }
@@ -141,7 +150,11 @@ namespace Untlited_Programming_Game
 
         public int getCurrentLine()
         {
-            Instruction currentIntrustion = this.Instructions[Registers["Counter"].value];
+            int counter = this.Registers["Counter"].value;
+            if (counter >= this.Instructions.Count)
+                counter = this.Instructions.Count - 1;
+
+            Instruction currentIntrustion = this.Instructions[counter];
             return currentIntrustion.line;
         }
 
