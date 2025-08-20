@@ -42,7 +42,7 @@ namespace Untlited_Programming_Game.Parser
             }
             else
             {
-                throw new InvalidSimbolException(line, "Branch instruction must be of type GOTO or JUMP");
+                throw new InvalidSimbolException(line, "Branch instruction must contain GOTO");
             }
         }
 
